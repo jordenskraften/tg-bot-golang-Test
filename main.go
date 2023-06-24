@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// Создание экземпляра бота с использованием токена
-	bot, err := tgbotapi.NewBotAPI("6028456895:AAHaIeEvq8SR0CPTLWWVp54ONd7NBfphBdg")
+	bot, err := tgbotapi.NewBotAPI("вставить сюда токен бота")
 	if err != nil {
 		log.Fatal(err)
 	}
