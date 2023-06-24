@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 
@@ -11,41 +12,48 @@ import (
 
 func main() {
 	// Создание экземпляра бота с использованием токена
-	bot, err := tgbotapi.NewBotAPI("вставить сюда токен бота")
-	if err != nil {
-		log.Fatal(err)
-	}
+	if len(os.Args) >= 2 {
 
-	// Установка режима отладки
-	bot.Debug = true
+		token := os.Args[1] // Получаем токен из аргумента командной строки
 
-	// Создание канала для получения обновлений
-	updateConfig := tgbotapi.NewUpdate(0)
-	updateConfig.Timeout = 60
+		token_string := string(token)
 
-	updates, err := bot.GetUpdatesChan(updateConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Обработка входящих сообщений
-	for update := range updates {
-		// Проверка типа обновления (сообщение, команда и т.д.)
-		if update.Message == nil {
-			continue
+		bot, err := tgbotapi.NewBotAPI(token_string)
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		// Получение текста сообщения
-		messageText := update.Message.Text
+		// Установка режима отладки
+		bot.Debug = true
 
-		// Обработка полученного сообщения
-		response := processMessage(messageText)
+		// Создание канала для получения обновлений
+		updateConfig := tgbotapi.NewUpdate(0)
+		updateConfig.Timeout = 60
 
-		// Отправка ответа пользователю
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, response)
-		_, err := bot.Send(msg)
+		updates, err := bot.GetUpdatesChan(updateConfig)
 		if err != nil {
-			log.Println(err)
+			log.Fatal(err)
+		}
+
+		// Обработка входящих сообщений
+		for update := range updates {
+			// Проверка типа обновления (сообщение, команда и т.д.)
+			if update.Message == nil {
+				continue
+			}
+
+			// Получение текста сообщения
+			messageText := update.Message.Text
+
+			// Обработка полученного сообщения
+			response := processMessage(messageText)
+
+			// Отправка ответа пользователю
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, response)
+			_, err := bot.Send(msg)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }

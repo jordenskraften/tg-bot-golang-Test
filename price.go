@@ -33,6 +33,9 @@ var priceFormulas = []PriceFormula{
 	{666, func(price float64) float64 {
 		return price + price*0.55 + 53
 	}},
+	{100000, func(price float64) float64 {
+		return price + price*0.5 + 53
+	}},
 	// Добавьте другие формулы здесь
 }
 
