@@ -1,40 +1,45 @@
 package main
 
+import (
+	"math"
+)
+
 type PriceFormula struct {
 	MaxPrice float64
 	Formula  func(float64) float64
 }
 
 var priceFormulas = []PriceFormula{
-	{135, func(price float64) float64 {
-		return price + price*1.5 + 53
+	{12000, func(price float64) float64 {
+		return price + price*1.5
 	}},
-	{200, func(price float64) float64 {
-		return price + price*0.9 + 53
+	{17000, func(price float64) float64 {
+		return price + price*0.9
 	}},
-	{266, func(price float64) float64 {
-		return price + price*0.85 + 53
+	{22000, func(price float64) float64 {
+		return price + price*0.85
 	}},
-	{333, func(price float64) float64 {
-		return price + price*0.8 + 53
+	{28000, func(price float64) float64 {
+		return price + price*0.8
 	}},
-	{400, func(price float64) float64 {
-		return price + price*0.75 + 53
+	{34000, func(price float64) float64 {
+		return price + price*0.75
 	}},
-	{466, func(price float64) float64 {
-		return price + price*0.7 + 53
+	{40000, func(price float64) float64 {
+		return price + price*0.7
 	}},
-	{533, func(price float64) float64 {
-		return price + price*0.65 + 53
+	{45000, func(price float64) float64 {
+		return price + price*0.65
 	}},
-	{600, func(price float64) float64 {
-		return price + price*0.6 + 53
+	{50000, func(price float64) float64 {
+		return price + price*0.6
 	}},
-	{666, func(price float64) float64 {
-		return price + price*0.55 + 53
+	{60000, func(price float64) float64 {
+		return price + price*0.55
 	}},
-	{100000, func(price float64) float64 {
-		return price + price*0.5 + 53
+	{math.MaxFloat64, func(price float64) float64 {
+		//для всех остальных вариантов превышающих заданные диапазоны
+		return price + price*0.55
 	}},
 	// Добавьте другие формулы здесь
 }
@@ -42,7 +47,11 @@ var priceFormulas = []PriceFormula{
 func SelectPriceFormula(price float64) float64 {
 	for _, formula := range priceFormulas {
 		if price <= formula.MaxPrice {
-			return formula.Formula(price)
+			//получим число по формулам
+			priceAfterCalc := formula.Formula(price)
+			//округлим вверх до тысяч
+			priceAfterRound := math.Ceil(priceAfterCalc/1000) * 1000
+			return priceAfterRound
 		}
 	}
 

@@ -12,39 +12,45 @@ import (
 
 func main() {
 	// Создание экземпляра бота с использованием токена
-	if len(os.Args) >= 2 {
 
-		token := os.Args[1] // Получаем токен из аргумента командной строки
+	token := os.Getenv("BOT_TOKEN")
+	bot, err := tgbotapi.NewBotAPI(token)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		token_string := string(token)
+	// Установка режима отладки
+	bot.Debug = false
 
-		bot, err := tgbotapi.NewBotAPI(token_string)
-		if err != nil {
-			log.Fatal(err)
+	// Создание канала для получения обновлений
+	updateConfig := tgbotapi.NewUpdate(0)
+	updateConfig.Timeout = 60
+
+	updates, err := bot.GetUpdatesChan(updateConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Обработка входящих сообщений
+	for update := range updates {
+		// Проверка типа обновления (сообщение, команда и т.д.)
+		if update.Message == nil {
+			continue
 		}
 
-		// Установка режима отладки
-		bot.Debug = true
+		// Получение текста сообщения
+		messageText := update.Message.Text
 
-		// Создание канала для получения обновлений
-		updateConfig := tgbotapi.NewUpdate(0)
-		updateConfig.Timeout = 60
-
-		updates, err := bot.GetUpdatesChan(updateConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Обработка входящих сообщений
-		for update := range updates {
-			// Проверка типа обновления (сообщение, команда и т.д.)
-			if update.Message == nil {
-				continue
+		if update.Message.IsCommand() { // проверяем, является ли сообщение командой
+			switch update.Message.Command() {
+			case "start":
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Привет, напишите стоимость заказа в российских рублях.")
+				_, err := bot.Send(msg)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-
-			// Получение текста сообщения
-			messageText := update.Message.Text
-
+		} else {
 			// Обработка полученного сообщения
 			response := processMessage(messageText)
 
@@ -68,7 +74,7 @@ func processMessage(message string) string {
 	} else {
 		//если число найдено прогоним его по формулам
 		number = SelectPriceFormula(number)
-		final_message := "Обновленная цена: " + fmt.Sprintf("%.2f", number)
+		final_message := "Обновленная цена: " + fmt.Sprintf("%.2f", number) + string('\u20BD')
 		return final_message
 	}
 }
